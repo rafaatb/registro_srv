@@ -84,6 +84,28 @@ app.get('/api/login/:param1/:param2', (req, res) => {
 
 });
 
+
+
+//LoginFeria
+app.get('/api/loginFeria', (req, res) => {
+    pool.query("SELECT a.id AS id_group,a.token AS token,a.asistentes,a.grupal,a.individual,(SELECT COUNT(*) FROM registro WHERE id_grupo=a.id AND borrado=0) AS registrados FROM GRUPOS as a WHERE feria=1" , (err, results) => {
+
+            if (err) {
+                console.error('Error executing the query:', err);
+                return res.status(500).json({ error: 'Internal Server Error' });
+
+            }
+            if (results.length > 0) {
+                res.json(results);
+                // You can return true here or perform additional actions
+            } else {
+                res.json(results);
+                // You can return false here or perform additional actions
+            }
+        });
+});
+
+
 //SELECT CLIENTE X ID
 app.get('/api/registro/:id', (req, res) => {
     // Use the connection pool to execute a query
@@ -122,8 +144,8 @@ app.post('/api/insertData', (req, res) => {
             res.status(500).json({ error: 'Database error' });
             return;
         }
-        const query = 'INSERT INTO registro (id_grupo, nombre, correo, telefono, congreso) VALUES (?, ?, ?, ?, ?) ';
-        const values = [data.id_grupo, data.nombre, data.correo, data.telefono, data.congreso];
+        const query = 'INSERT INTO registro (id_grupo, nombre, correo, telefono, congreso,ref) VALUES (?, ?, ?, ?, ?,?) ';
+        const values = [data.id_grupo, data.nombre, data.correo, data.telefono, data.congreso, data.ref];
 
         connection.query(query, values, (error) => {
             connection.release(); // Release the connection
